@@ -1,0 +1,1 @@
+Algoritmo Genético - Real Coded (Computação Evolucionária Aplicada)
