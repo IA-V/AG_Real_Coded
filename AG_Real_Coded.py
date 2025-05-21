@@ -60,7 +60,30 @@ class AG_real_coded:
         #return ret
         
     def mutar(self):
-        pass
+        lista_pop = list(self.populacao) # Lista de chaves (cromossomos)
+        qtd_individuos = math.floor(len(lista_pop) * self.taxa_mutacao)
+        
+        lista_idxs_mutados = [] # Lista para armazenar índices dos indivíduos já mutados (não mutar o mesmo indivíduo duas vezes seguidas)
+        
+        cont = 0
+        while(cont < qtd_individuos):
+            idx_individuo_mutar = math.floor(random.uniform(0, len(lista_pop))) # Índice dos indivíduos a serem mutados
+
+            while (idx_individuo_mutar in lista_idxs_mutados):
+                idx_individuo_mutar = math.floor(random.uniform(0, len(lista_pop)))
+
+            posicao = math.floor(random.uniform(0, self.tam_cromossomo-1)) # Ponto aleatório onde o indivíduo será mutado
+            novo_gene = random.uniform(self.alelos_bl, self.alelos_ul)
+
+            lista_genes = list(lista_pop[idx_individuo_mutar]) # Transforma tupla que identifica o cromossomo em lista
+            lista_genes[posicao] = novo_gene # Altera gene do cromossomo
+            lista_genes = tuple(lista_genes) # Transforma lista que identifica o cromossomo em tupla novamente
+            
+            self.populacao[lista_genes] = self.populacao.pop(lista_pop[idx_individuo_mutar]) # Cria nova chave no dicionário, apaga a chave antiga em pop() e atribui seu valor à nova chave
+            self.populacao[lista_genes] = self.avaliar_cromossomo(lista_genes) # Atualiza pontuação do cromossomo mutado
+
+            lista_idxs_mutados.append(idx_individuo_mutar)
+            cont += 1
 
     def ordenar_pop(self):
         self.populacao = dict(sorted(self.populacao.items(), key=lambda item: item[1])) # Ordem crescente de pontuações
@@ -168,6 +191,7 @@ else:
             ag01.cruzar(lista_chaves[i], lista_chaves[i+1], 2)
 
 print("Qtd de filhos novos: {}".format( len(ag01.filhos) ))
+ag01.mutar()
 ag01.elitismo()
 print("Qtd de sobreviventes: {}".format( len(ag01.sobreviventes) ))
 ag01.proxima_geracao()
